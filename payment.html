@@ -24,19 +24,10 @@ button:disabled{opacity:0.5; cursor:not-allowed;}
 .success{display:none;margin-top:18px;padding:14px;border-radius:14px;background:rgba(0,210,106,.12);border:1px solid rgba(0,210,106,.25);text-align:center;color:#00D26A;}
 .note{margin-top:15px;font-size:12px;color:#aaa;text-align:center;}
 #planTag{margin-top:6px;font-size:12px;color:#aaa;}
-.grid-2{display:grid; grid-template-columns: 1fr 1fr; gap:12px;}
-
-/* TIMER */
-.timer-box{
-  background: linear-gradient(90deg, rgba(255,0,0,0.15), rgba(255,215,0,0.15));
-  border: 1px solid rgba(255,215,0,.3);
-  padding: 14px;
-  border-radius: 16px;
-  text-align: center;
-  margin-bottom: 18px;
-}
+.timer-box{background: linear-gradient(90deg, rgba(255,0,0,0.15), rgba(255,215,0,0.15));border: 1px solid rgba(255,215,0,.3);padding: 14px;border-radius: 16px;text-align: center;margin-bottom: 18px;}
 .timer-box p{font-size:12px; color:#FFD700;}
 #timer{font-size:24px; font-weight:800; color:#FFD700; letter-spacing:2px;}
+.account-number{font-size:18px; font-weight:800; color:#FFD700; letter-spacing:1px;}
 </style>
 </head>
 <body>
@@ -46,7 +37,6 @@ button:disabled{opacity:0.5; cursor:not-allowed;}
 <h1>Complete Payment</h1>
 <p class="sub">Activate your <span id="planNameInline">eSIM</span> to start earning</p>
 
-<!-- URGENCY TIMER -->
 <div class="timer-box">
   <p>⏰ Complete payment before timer runs out</p>
   <div id="timer">15:00</div>
@@ -58,37 +48,31 @@ button:disabled{opacity:0.5; cursor:not-allowed;}
 <div id="planTag"></div>
 </div>
 
-<!-- BOTH ACCOUNTS VISIBLE -->
+<!-- ACCOUNT 1 -->
 <div class="box">
-<strong style="display:block; margin-bottom:10px;">CHOOSE ANY BANK TO PAY</strong>
-  <div class="grid-2">
-    <!-- BANK 1 -->
-    <div style="border:1px solid rgba(0,210,106,.2); padding:12px; border-radius:12px;">
-      <p style="font-size:12px; color:#FFD700; font-weight:600;">Option 1</p>
-      <div class="row"><span>Bank</span><span style="color:#fff;">Safehaven</span></div>
-      <div class="row"><span>Name</span><span style="color:#fff;">Divine abanum</span></div>
-      <div class="row"><span>Account</span><span style="color:#FFD700; font-weight:700;">0116244574</span></div>
-      <button class="copy-btn" onclick="copyAccount('0116244574',this)">Copy</button>
-    </div>
+<strong>PAYMENT OPTION 1</strong>
+<div class="row"><span>Bank</span><span>Safehaven</span></div>
+<div class="row"><span>Account Name</span><span>Divine abanum</span></div>
+<div class="row"><span>Account Number</span><span class="account-number">0116244574</span></div>
+<button class="copy-btn" onclick="copyAccount('0116244574',this)">Copy Account Number</button>
+</div>
 
-    <!-- BANK 2 -->
-    <div style="border:1px solid rgba(255,215,0,.2); padding:12px; border-radius:12px;">
-      <p style="font-size:12px; color:#FFD700; font-weight:600;">Option 2</p>
-      <div class="row"><span>Bank</span><span style="color:#fff;">PALMPAY</span></div>
-      <div class="row"><span>Name</span><span style="color:#fff;">Divine Abanum</span></div>
-      <div class="row"><span>Account</span><span style="color:#FFD700; font-weight:700;">9160049921</span></div>
-      <button class="copy-btn" onclick="copyAccount('9160049921',this)">Copy</button>
-    </div>
-  </div>
+<!-- ACCOUNT 2 -->
+<div class="box">
+<strong>PAYMENT OPTION 2</strong>
+<div class="row"><span>Bank</span><span>PALMPAY</span></div>
+<div class="row"><span>Account Name</span><span>Divine Abanum</span></div>
+<div class="row"><span>Account Number</span><span class="account-number">9160049921</span></div>
+<button class="copy-btn" onclick="copyAccount('9160049921',this)">Copy Account Number</button>
 </div>
 
 <button id="confirmBtn">I Have Made Payment</button>
-<div class="success" id="successBox">Payment submitted! Activating account...</div>
-<div class="note">After payment, click the button above to activate your account instantly.</div>
+<div class="success" id="successBox">Opening Telegram to notify support...</div>
+<div class="note">Click above after payment. Your details will be sent automatically.</div>
 </div>
 
 <script>
-/* LOAD PLAN FROM LOCALSTORAGE */
+/* LOAD PLAN + USER FROM LOCALSTORAGE */
 const user = JSON.parse(localStorage.getItem('nextel_user'));
 const params = new URLSearchParams(window.location.search);
 const urlPlan = (params.get("plan") || "").toLowerCase().trim();
@@ -121,7 +105,7 @@ function copyAccount(number, btn){
 }
 
 /* TIMER - 15 MINUTES */
-let timeLeft = 15 * 60; // 15 minutes in seconds
+let timeLeft = 15 * 60;
 const timerEl = document.getElementById('timer');
 const confirmBtn = document.getElementById('confirmBtn');
 
@@ -131,11 +115,7 @@ const countdown = setInterval(() => {
   minutes = minutes < 10? '0' + minutes : minutes;
   seconds = seconds < 10? '0' + seconds : seconds;
   timerEl.innerText = `${minutes}:${seconds}`;
-
-  if(timeLeft <= 60) {
-    timerEl.style.color = '#FF0000'; // turn red in last 1 min
-  }
-
+  if(timeLeft <= 60) { timerEl.style.color = '#FF0000'; }
   if(timeLeft <= 0) {
     clearInterval(countdown);
     timerEl.innerText = "00:00";
@@ -146,24 +126,40 @@ const countdown = setInterval(() => {
   timeLeft--;
 }, 1000);
 
-/* BUTTON ACTION */
+/* BUTTON ACTION - REDIRECT TO TELEGRAM WITH MESSAGE */
 const btn = document.getElementById("confirmBtn");
 const success = document.getElementById("successBox");
 
 btn.addEventListener("click",()=>{
-  clearInterval(countdown); // stop timer
-  btn.innerText = "Processing...";
+  clearInterval(countdown);
+  btn.innerText = "Opening Telegram...";
   btn.disabled = true;
   success.style.display = "block";
 
+  // ACTIVATE USER
   if(user) {
     user.activated = true;
     user.tier = "Silver";
     localStorage.setItem('nextel_user', JSON.stringify(user));
   }
 
+  // CREATE TELEGRAM MESSAGE
+  const userName = user? user.name : "Customer";
+  const userEmail = user? user.email : "No email";
+  const message = `Hello Nextel Support,
+I just made payment for ${planData.name} - ${planData.price}
+
+Name: ${userName}
+Email: ${userEmail}
+Please activate my account ASAP.
+
+Thank you`;
+
+  const telegramURL = `https://t.me/magnusstaff?text=${encodeURIComponent(message)}`;
+
+  // REDIRECT TO TELEGRAM AFTER 2 SECONDS
   setTimeout(()=>{
-    window.location.href = "dashboard.html";
+    window.location.href = telegramURL;
   },2000);
 });
 </script>
