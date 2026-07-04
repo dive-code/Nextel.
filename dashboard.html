@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nextel Connect - Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Poppins', sans-serif; background: #0A0F1E; }
+.glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+.gradient-text { background: linear-gradient(90deg, #00D26A, #FFD700); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.popup { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 999; justify-content: center; align-items: center; }
+</style>
+</head>
+<body class="text-white min-h-screen pb-20">
+
+<!-- Header -->
+<header class="glass sticky top-0 z-50 px-4 py-3 flex justify-between items-center">
+  <div class="flex items-center gap-3">
+    <div id="userAvatar" class="w-10 h-10 rounded-full bg-gradient-to-r from-green-500 to-yellow-400 flex items-center justify-center font-bold text-black">N</div>
+    <h1 class="text-xl font-bold">NEXTEL</h1>
+  </div>
+  <div class="text-right">
+    <p id="userName" class="text-sm font-semibold">User</p>
+    <p id="userTier" class="text-xs text-red-400">Not Activated</p>
+  </div>
+</header>
+
+<!-- Welcome -->
+<section class="px-4 pt-6">
+  <h2 class="text-2xl font-bold">Good evening, <span id="welcomeName" class="gradient-text">User</span> 👋</h2>
+  <p class="text-gray-400 text-sm mt-1">Activate your account to start earning</p>
+</section>
+
+<!-- Active Plan Card -->
+<section class="px-4 mt-4">
+  <div class="glass rounded-2xl p-4 border-l-4 border-red-500">
+    <p class="text-gray-400 text-sm">Active Plan</p>
+    <h3 id="userPlan" class="text-xl font-bold mt-1 text-yellow-400">No Plan Selected</h3>
+    <p id="activationStatus" class="text-red-400 text-xs mt-2">❌ Account Not Activated</p>
+  </div>
+</section>
+
+<!-- Stats Cards -->
+<section class="px-4 mt-4 grid-cols-2 gap-4">
+  <div class="glass rounded-2xl p-4">
+    <p class="text-gray-400 text-sm">Total Balance</p>
+    <h3 id="userBalance" class="text-2xl font-bold mt-1">₦0</h3>
+  </div>
+  <div class="glass rounded-2xl p-4">
+    <p class="text-gray-400 text-sm">Referrals</p>
+    <h3 id="userReferrals" class="text-2xl font-bold mt-1">0</h3>
+  </div>
+</section>
+
+<!-- Quick Actions -->
+<section class="px-4 mt-6">
+  <h3 class="font-semibold mb-3">Quick Actions</h3>
+  <div class="grid grid-cols-4 gap-3 text-center">
+    <button onclick="checkActivation('fund')" class="glass rounded-xl py-3 hover:bg-green-500/20">💰<p class="text-xs mt-1">Fund</p></button>
+    <button onclick="checkActivation('withdraw')" class="glass rounded-xl py-3 hover:bg-green-500/20">📤<p class="text-xs mt-1">Withdraw</p></button>
+    <button onclick="checkActivation('refer')" class="glass rounded-xl py-3 hover:bg-green-500/20">👥<p class="text-xs mt-1">Refer</p></button>
+    <button onclick="checkActivation('history')" class="glass rounded-xl py-3 hover:bg-green-500/20">📊<p class="text-xs mt-1">History</p></button>
+  </div>
+</section>
+
+<!-- Bottom Nav -->
+<nav class="glass fixed bottom-0 left-0 right-0 flex justify-around py-3">
+  <button onclick="checkActivation('home')" class="text-green-400">🏠<br><span class="text-xs">Home</span></button>
+  <button onclick="checkActivation('earn')" class="text-gray-400">📈<br><span class="text-xs">Earn</span></button>
+  <button onclick="checkActivation('team')" class="text-gray-400">👥<br><span class="text-xs">Team</span></button>
+  <button onclick="checkActivation('profile')" class="text-gray-400">⚙️<br><span class="text-xs">Profile</span></button>
+</nav>
+
+<!-- Activation Popup -->
+<div id="popup" class="popup">
+  <div class="glass rounded-2xl p-6 m-4 text-center max-w-sm">
+    <h3 class="text-xl font-bold mb-2">Account Not Activated</h3>
+    <p class="text-gray-300 mb-4">You need to activate your account with your selected plan to continue.</p>
+    <button onclick="goToPayment()" class="w-full bg-gradient-to-r from-green-500 to-yellow-400 text-black font-bold py-3 rounded-xl mb-2">Activate Now</button>
+    <button onclick="closePopup()" class="w-full bg-gray-700 py-2 rounded-xl">Cancel</button>
+  </div>
+</div>
+
+<script>
+// Load user data
+const user = JSON.parse(localStorage.getItem('nextel_user'));
+
+if(user) {
+  document.getElementById('userName').innerText = user.name;
+  document.getElementById('welcomeName').innerText = user.name.split(' ')[0];
+  document.getElementById('userPlan').innerText = user.plan;
+  document.getElementById('userBalance').innerText = '₦' + user.balance.toLocaleString();
+  document.getElementById('userReferrals').innerText = user.referrals;
+  document.getElementById('userAvatar').innerText = user.name.charAt(0).toUpperCase();
+
+  // Check if activated
+  if(user.activated) {
+    document.getElementById('userTier').innerText = user.tier;
+    document.getElementById('userTier').className = "text-xs text-green-400";
+    document.getElementById('activationStatus').innerText = "✅ Account Activated";
+    document.getElementById('activationStatus').className = "text-green-400 text-xs mt-2";
+  }
+} else {
+  alert("Please register first");
+  window.location.href = "register.html";
+}
+
+// Check activation before any action
+function checkActivation(page) {
+  if(!user.activated) {
+    document.getElementById('popup').style.display = 'flex';
+  } else {
+    alert("Going to " + page + " page..."); // Replace with real page links later
+    // window.location.href = page + ".html";
+  }
+}
+
+function goToPayment() {
+  window.location.href = "payment.html";
+}
+
+function closePopup() {
+  document.getElementById('popup').style.display = 'none';
+}
+</script>
+
+</body>
+</html>
