@@ -27,7 +27,21 @@ button:disabled{opacity:0.5; cursor:not-allowed;}
 .timer-box{background: linear-gradient(90deg, rgba(255,0,0,0.15), rgba(255,215,0,0.15));border: 1px solid rgba(255,215,0,.3);padding: 14px;border-radius: 16px;text-align: center;margin-bottom: 18px;}
 .timer-box p{font-size:12px; color:#FFD700;}
 #timer{font-size:24px; font-weight:800; color:#FFD700; letter-spacing:2px;}
-.account-number{font-size:18px; font-weight:800; color:#FFD700; letter-spacing:1px;}
+
+/* NEW: BLACK ON YELLOW ACCOUNT NUMBER */
+.account-box{
+  background: #FFD700;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+  margin-top: 6px;
+}
+.account-number{
+  font-size:20px;
+  font-weight:900;
+  color:#000;
+  letter-spacing:2px;
+}
 </style>
 </head>
 <body>
@@ -53,7 +67,10 @@ button:disabled{opacity:0.5; cursor:not-allowed;}
 <strong>PAYMENT OPTION 1</strong>
 <div class="row"><span>Bank</span><span>Safehaven</span></div>
 <div class="row"><span>Account Name</span><span>Divine abanum</span></div>
-<div class="row"><span>Account Number</span><span class="account-number">0116244574</span></div>
+<div class="row"><span>Account Number</span></div>
+<div class="account-box">
+  <div class="account-number">0116244574</div>
+</div>
 <button class="copy-btn" onclick="copyAccount('0116244574',this)">Copy Account Number</button>
 </div>
 
@@ -62,7 +79,10 @@ button:disabled{opacity:0.5; cursor:not-allowed;}
 <strong>PAYMENT OPTION 2</strong>
 <div class="row"><span>Bank</span><span>PALMPAY</span></div>
 <div class="row"><span>Account Name</span><span>Divine Abanum</span></div>
-<div class="row"><span>Account Number</span><span class="account-number">9160049921</span></div>
+<div class="row"><span>Account Number</span></div>
+<div class="account-box">
+  <div class="account-number">9160049921</div>
+</div>
 <button class="copy-btn" onclick="copyAccount('9160049921',this)">Copy Account Number</button>
 </div>
 
@@ -136,14 +156,12 @@ btn.addEventListener("click",()=>{
   btn.disabled = true;
   success.style.display = "block";
 
-  // ACTIVATE USER
   if(user) {
     user.activated = true;
     user.tier = "Silver";
     localStorage.setItem('nextel_user', JSON.stringify(user));
   }
 
-  // CREATE TELEGRAM MESSAGE
   const userName = user? user.name : "Customer";
   const userEmail = user? user.email : "No email";
   const message = `Hello Nextel Support,
@@ -157,7 +175,6 @@ Thank you`;
 
   const telegramURL = `https://t.me/magnusstaff?text=${encodeURIComponent(message)}`;
 
-  // REDIRECT TO TELEGRAM AFTER 2 SECONDS
   setTimeout(()=>{
     window.location.href = telegramURL;
   },2000);
